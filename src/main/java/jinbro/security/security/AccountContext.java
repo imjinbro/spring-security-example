@@ -12,8 +12,8 @@ import java.util.List;
 
 public class AccountContext extends User {
 
-    private AccountContext(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
+    private AccountContext(String userId, String password, Collection<? extends GrantedAuthority> authorities) {
+        super(userId, password, authorities);
     }
 
     public static AccountContext fromAccountModel(Account account) {

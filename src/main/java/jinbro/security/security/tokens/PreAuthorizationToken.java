@@ -4,12 +4,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 public class PreAuthorizationToken extends UsernamePasswordAuthenticationToken {
 
-    public PreAuthorizationToken(String userName, String password) {
-        super(userName, password);
+    public PreAuthorizationToken(String userId, String password) {
+        super(userId, password);
 
     }
 
-    public String getUserName() {
+    public String getUserId() {
         return String.valueOf(super.getPrincipal());
     }
 
