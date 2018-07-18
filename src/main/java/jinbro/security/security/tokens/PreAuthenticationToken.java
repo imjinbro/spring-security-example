@@ -1,12 +1,16 @@
 package jinbro.security.security.tokens;
 
+import jinbro.security.dto.FormLoginDto;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-public class PreAuthorizationToken extends UsernamePasswordAuthenticationToken {
+public class PreAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
-    public PreAuthorizationToken(String userId, String password) {
+    public PreAuthenticationToken(String userId, String password) {
         super(userId, password);
+    }
 
+    public PreAuthenticationToken(FormLoginDto loginDto) {
+        super(loginDto.getUserId(), loginDto.getPassword());
     }
 
     public String getUserId() {

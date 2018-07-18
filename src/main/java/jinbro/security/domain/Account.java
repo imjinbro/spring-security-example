@@ -14,13 +14,21 @@ public class Account {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private UserRole role = UserRole.USER;
 
     private Long socialId;
     private String profileHref;
 
     public Account() {
+    }
 
+    public Account(String userId, String password, String name, UserRole role, Long socialId, String profileHref) {
+        this.userId = userId;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+        this.socialId = socialId;
+        this.profileHref = profileHref;
     }
 
     public Long getId() {

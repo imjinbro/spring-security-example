@@ -3,17 +3,19 @@ package jinbro.security.security.provider;
 import jinbro.security.domain.Account;
 import jinbro.security.security.AccountContext;
 import jinbro.security.security.AccountService;
-import jinbro.security.security.tokens.PostAuthorizationToken;
-import jinbro.security.security.tokens.PreAuthorizationToken;
+import jinbro.security.security.tokens.PostAuthenticationToken;
+import jinbro.security.security.tokens.PreAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.util.NoSuchElementException;
 
-public class FromLoginAuthenticationProvider implements AuthenticationProvider {
+@Component
+public class FormLoginAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
     private AccountService accountService;
@@ -26,11 +28,11 @@ public class FromLoginAuthenticationProvider implements AuthenticationProvider {
      */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        PreAuthorizationToken preAuthorizationToken = (PreAuthorizationToken) authentication;
-        Account account = accountService.findByUserId(preAuthorizationToken.getUserId());
+        PreAuthenticationToken preAuthenticationToken = (PreAuthenticationToken) authentication;
+        Account account = accountService.findByUserId(preAuthenticationToken.getUserId());
 
-        if (isCorrectPassword(account, preAuthorizationToken.getUserPassword())) {
-            return PostAuthorizationToken.getTokenFrom(AccountContext.fromAccountModel(account));
+        if (isCorrectPassword(preAuthenticationToken.getUserPassword(), account)) {
+            return PostAuthenticationToken.getTokenFrom(AccountContext.fromAccountModel(account));
         }
         throw new NoSuchElementException("인증정보가 정확하지않습니다.");
     }
@@ -41,10 +43,10 @@ public class FromLoginAuthenticationProvider implements AuthenticationProvider {
      */
     @Override
     public boolean supports(Class<?> authentication) {
-        return PreAuthorizationToken.class.isAssignableFrom(authentication);
+        return PreAuthenticationToken.class.isAssignableFrom(authentication);
     }
 
-    private boolean isCorrectPassword(Account account, String password) {
-        return passwordEncoder.matches(account.getPassword(), password);
+    private boolean isCorrectPassword(String password, Account account) {
+        return passwordEncoder.matches(password, account.getPassword());
     }
 }
