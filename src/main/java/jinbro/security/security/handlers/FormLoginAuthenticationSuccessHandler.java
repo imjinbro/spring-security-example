@@ -3,7 +3,7 @@ package jinbro.security.security.handlers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jinbro.security.dto.TokenDto;
 import jinbro.security.security.AccountContext;
-import jinbro.security.security.JwtFactory;
+import jinbro.security.security.JwtManager;
 import jinbro.security.security.tokens.PostAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ import java.io.IOException;
 public class FormLoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     @Autowired
-    private JwtFactory jwtFactory;
+    private JwtManager jwtManager;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -32,7 +32,7 @@ public class FormLoginAuthenticationSuccessHandler implements AuthenticationSucc
         AccountContext accountContext = (AccountContext) token.getPrincipal();
         response.setStatus(HttpStatus.OK.value());
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-        response.getWriter().write(objectMapper.writeValueAsString(generateTokenDto(jwtFactory.generateToken(accountContext))));
+        response.getWriter().write(objectMapper.writeValueAsString(generateTokenDto(jwtManager.generateToken(accountContext))));
     }
 
     private TokenDto generateTokenDto(String tokenMessage) {

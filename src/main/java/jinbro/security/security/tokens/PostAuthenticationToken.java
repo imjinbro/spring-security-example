@@ -15,4 +15,9 @@ public class PostAuthenticationToken extends UsernamePasswordAuthenticationToken
     public static PostAuthenticationToken getTokenFrom(AccountContext accountContext) {
         return new PostAuthenticationToken(accountContext, accountContext.getPassword(), accountContext.getAuthorities());
     }
+
+    public String getUserId() {
+        AccountContext accountContext = (AccountContext) super.getPrincipal();
+        return accountContext.getUsername();
+    }
 }
