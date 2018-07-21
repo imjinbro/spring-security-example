@@ -3,11 +3,12 @@ package jinbro.security.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jinbro.security.security.filters.FormLoginFilter;
 import jinbro.security.security.filters.JwtAuthenticationFilter;
+import jinbro.security.security.filters.SocialLoginFilter;
 import jinbro.security.security.handlers.FormLoginAuthenticationFailureHandler;
-import jinbro.security.security.handlers.FormLoginAuthenticationSuccessHandler;
 import jinbro.security.security.handlers.JwtAuthenticationFailureHandler;
 import jinbro.security.security.provider.FormLoginAuthenticationProvider;
 import jinbro.security.security.provider.JwtAuthenticationProvider;
+import jinbro.security.security.provider.SocialLoginProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collections;
@@ -31,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /*** form authentication ***/
     @Autowired
-    private FormLoginAuthenticationSuccessHandler formLoginAuthenticationSuccessHandler;
+    private AuthenticationSuccessHandler uniAuthenticationSuccessHandler;
 
     @Autowired
     private FormLoginAuthenticationFailureHandler formLoginAuthenticationFailureHandler;
@@ -50,6 +52,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationProvider jwtAuthenticationProvider;
 
+    @Autowired
+    private SocialLoginProvider socialLoginProvider;
+
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -66,9 +71,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private FormLoginFilter formLoginFilter() throws Exception {
-        FormLoginFilter formLoginFilter = new FormLoginFilter("/login", formLoginAuthenticationSuccessHandler, formLoginAuthenticationFailureHandler);
+        FormLoginFilter formLoginFilter = new FormLoginFilter("/login", uniAuthenticationSuccessHandler, formLoginAuthenticationFailureHandler);
         formLoginFilter.setAuthenticationManager(super.authenticationManagerBean());
         return formLoginFilter;
+    }
+
+    private SocialLoginFilter socialLoginFilter() throws Exception {
+        SocialLoginFilter socialLoginFilter = SocialLoginFilter.createSocialFilter("/socialLogin", uniAuthenticationSuccessHandler);
+        socialLoginFilter.setAuthenticationManager(super.authenticationManagerBean());
+        return socialLoginFilter;
     }
 
     private JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
@@ -82,6 +93,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(formLoginAuthenticationProvider);
         auth.authenticationProvider(jwtAuthenticationProvider);
+        auth.authenticationProvider(socialLoginProvider);
     }
 
     @Override
@@ -91,5 +103,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
         http.addFilterBefore(formLoginFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(socialLoginFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 }

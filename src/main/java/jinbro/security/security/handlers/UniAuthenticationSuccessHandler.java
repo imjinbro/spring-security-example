@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class FormLoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class UniAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     @Autowired
     private JwtManager jwtManager;
